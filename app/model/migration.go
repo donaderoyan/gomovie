@@ -7,8 +7,11 @@ import (
 
 func Migration(db *gorm.DB) *gorm.DB {
   db.AutoMigrate(
-    &Film{},
-    &Category{}
+    &User{},
+    &Email{},
+    &Address{},
+    &Language{},
+    &CreditCard{},
   )
   return db
 }

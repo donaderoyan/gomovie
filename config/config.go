@@ -1,6 +1,6 @@
 package config
 
-type Configuration struct {
+type Config struct {
   DB *DBConfiguration
 }
 
@@ -13,15 +13,15 @@ type DBConfiguration struct {
   Password  string
 }
 
-func GetConfig() *Configuration {
-  return &Configuration{
+func GetConfig() *Config {
+  return &Config{
     DB: &DBConfiguration{
       Dialect:    "postgres",
       Host:       "127.0.0.1",
       Port:       5432,
       User:       "postgres",
-      Dbname:     "gomovie",
-      Password:   "ab123456"
-    }
+      Dbname:     "gormtest",
+      Password:   "ab123456",
+    },
   }
 }

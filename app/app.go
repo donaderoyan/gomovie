@@ -2,12 +2,15 @@ package app
 
 import (
     "fmt"
+    "log"
     "net/http"
 
     "github.com/gorilla/mux"
     "github.com/jinzhu/gorm"
+    _ "github.com/jinzhu/gorm/dialects/postgres"
+    "github.com/donaderoyan/gomovie/app/controller"
     "github.com/donaderoyan/gomovie/app/model"
-    "github.com/donaderoyan/gomovie/conf/configuration"
+    "github.com/donaderoyan/gomovie/config"
 )
 
 type App struct {
@@ -16,17 +19,17 @@ type App struct {
 }
 
 func (a *App) Initialize(config *config.Config) {
-  dbURI := fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s",
+  dbURI := fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
     config.DB.Host,
     config.DB.Port,
     config.DB.User,
     config.DB.Dbname,
-    config.DB.Password
+    config.DB.Password,
     )
-
+  fmt.Printf("%+v\n", dbURI)
   db, err := gorm.Open(config.DB.Dialect, dbURI)
   if err != nil {
-    log.Fatal("Could not connect database")
+    log.Fatal("Could not connect database %s", err.Error())
   }
 
   a.DB = model.Migration(db)
@@ -35,8 +38,8 @@ func (a *App) Initialize(config *config.Config) {
 }
 
 func (a *App) setRouters() {
-  a.Get("/film", a.handleRequest(handler.GetAllfilm))
-  a.Post("/film", a.handleRequest(handler.CreateFilm))
+  a.Get("/user", a.handleRequest(controller.GetAllUser))
+  a.Post("/user", a.handleRequest(controller.CreateUser))
 }
 
 
@@ -58,7 +61,7 @@ func (a *App) Run(host string) {
 
 type RequestHandlerFunction func(db *gorm.DB, w http.ResponseWriter, r *http.Request)
 
-func (a *App) handleRequest(handler RequestHandlerFunction) http.HandleFunc {
+func (a *App) handleRequest(handler RequestHandlerFunction) http.HandlerFunc {
   return func (w http.ResponseWriter, r *http.Request) {
     handler(a.DB, w, r)
   }

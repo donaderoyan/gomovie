@@ -1,16 +1,14 @@
 package main
 
-import (
-  "fmt"
-  "net/http"
+import(
+  "github.com/donaderoyan/gomovie/app"
+  "github.com/donaderoyan/gomovie/config"
 )
 
-
-func test(w http.ResponseWriter, r *http.Request) {
-  fmt.Fprintf(w, "yuhuuu")
-}
-
 func main() {
-  http.HandleFunc("/test", test)
-  http.ListenAndServe(":8765", nil)
+  config := config.GetConfig()
+
+  app := &app.App{}
+  app.Initialize(config)
+  app.Run(":7200")
 }
