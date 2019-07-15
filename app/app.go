@@ -29,7 +29,7 @@ func (a *App) Initialize(config *config.Config) {
     log.Fatal("Could not connect database")
   }
 
-  a.DB = model.AutoMigrate(db)
+  a.DB = model.Migration(db)
   a.Router = mux.NewRouter()
   a.setRouters()
 }
@@ -48,4 +48,18 @@ func (a *App) Get(path string, f func(w http.ResponseWriter, r *http.Request)) {
 // Post wraps the router for POST method
 func (a *App) Post(path string, f func(w http.ResponseWriter, r *http.Request)) {
 	a.Router.HandleFunc(path, f).Methods("POST")
+}
+
+
+//Run app on it's router
+func (a *App) Run(host string) {
+  log.Fatal(http.ListenAndServe(host, a.Router))
+}
+
+type RequestHandlerFunction func(db *gorm.DB, w http.ResponseWriter, r *http.Request)
+
+func (a *App) handleRequest(handler RequestHandlerFunction) http.HandleFunc {
+  return func (w http.ResponseWriter, r *http.Request) {
+    handler(a.DB, w, r)
+  }
 }
